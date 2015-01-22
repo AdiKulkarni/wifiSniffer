@@ -1,8 +1,6 @@
 package com.example.wifisniffer;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -13,8 +11,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.os.Handler;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -22,7 +19,7 @@ public class MainActivity extends Activity {
 	private TextView txtAssoc, txtScan;
 	private IntentFilter i;
 	private BroadcastReceiver receiver;
-	private Timer timer;
+	private static long SCAN_DELAY = 2000;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +28,7 @@ public class MainActivity extends Activity {
 
 		txtAssoc = (TextView) findViewById(R.id.txtAssoc);
 		txtScan = (TextView) findViewById(R.id.txtScan);
+		
 		i = new IntentFilter();
 		i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 
@@ -47,7 +45,6 @@ public class MainActivity extends Activity {
 				txtScan.setText(sb.toString());
 			}
 		};
-
 	}
 
 	@Override
@@ -55,36 +52,40 @@ public class MainActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onResume();
 
-		timer = new Timer(true);
-		timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-				if (wm.isWifiEnabled()) {
-					WifiInfo info = wm.getConnectionInfo();
-					if (info != null) {
-						txtAssoc.setText("Associated with " + info.getSSID()
-								+ "\nat " + info.getLinkSpeed()
-								+ WifiInfo.LINK_SPEED_UNITS + " ("
-								+ info.getRssi() + " dBM)");
+		try {
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					// Your process to do
+					WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+					if (wm.isWifiEnabled()) {
+						wm.startScan();
+						WifiInfo info = wm.getConnectionInfo();
+						if (info != null) {
+							txtAssoc.setText("Associated with "
+									+ info.getSSID() + "\nat "
+									+ info.getLinkSpeed()
+									+ WifiInfo.LINK_SPEED_UNITS + " ("
+									+ info.getRssi() + " dBM)");
+						} else {
+							txtAssoc.setText("Not currently associated.");
+						}
+						
 					} else {
-						txtAssoc.setText("Not currently associated.");
+						txtAssoc.setText("WIFI is disabled.");
 					}
-					wm.startScan();
-				} else {
-					txtAssoc.setText("WIFI is disabled.");
 				}
-			}
-		}, 0, 2000);
-		registerReceiver(receiver, i);
-
+			}, SCAN_DELAY);
+			registerReceiver(receiver, i);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onStop();
-		timer.cancel();
 		unregisterReceiver(receiver);
 
 	}

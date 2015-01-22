@@ -1,17 +1,33 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.wifisniffer.MainActivity" >
+    android:fillViewport="true" >
 
-    <TextView
-        android:id="@+id/txtAssoc"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/txtScan"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/txtAssoc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Association" />
+
+            <TextView
+                android:id="@+id/txtScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/txtAssoc"
+                android:text="Scan" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</ScrollView>
